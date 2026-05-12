@@ -98,11 +98,11 @@ button{
 
 <div class="header">
 
-    <img src="mallik logo -1.jpg" class="logo">
+<img src="mallik logo -1.jpg" class="logo">
 
-    <h1>Mallik Engineering (India) Pvt Ltd</h1>
+<h1>Mallik Engineering (India) Pvt Ltd</h1>
 
-    <h2>Aptitude & Technical Evaluation Paper2</h2>
+<h2>Aptitude & Technical Evaluation</h2>
 
 </div>
 
@@ -280,16 +280,17 @@ answer:"A"
 
 ];
 
-// REPEAT QUESTIONS TO MAKE 50
+// MAKE 50 QUESTIONS
 
 while(questions.length < 50){
 
-    questions.push(...questions.slice(0,10));
+questions.push(...questions.slice(0,10));
+
 }
 
 questions.length = 50;
 
-// RANDOM QUESTIONS
+// RANDOMIZE QUESTIONS
 
 questions.sort(() => Math.random() - 0.5);
 
@@ -297,207 +298,209 @@ questions.sort(() => Math.random() - 0.5);
 
 function startExam(){
 
-    const name =
-    document.getElementById("name").value.trim();
+const name =
+document.getElementById("name").value.trim();
 
-    const mobile =
-    document.getElementById("mobile").value.trim();
+const mobile =
+document.getElementById("mobile").value.trim();
 
-    const email =
-    document.getElementById("email").value.trim();
+const email =
+document.getElementById("email").value.trim();
 
-    if(!name || !mobile || !email){
+if(!name || !mobile || !email){
 
-        alert("Please fill all details");
+alert("Please fill all details");
 
-        return;
-    }
+return;
+}
 
-    examStarted = true;
+examStarted = true;
 
-    document.getElementById("loginPage")
-    .classList.add("hidden");
+document.getElementById("loginPage")
+.classList.add("hidden");
 
-    document.getElementById("examPage")
-    .classList.remove("hidden");
+document.getElementById("examPage")
+.classList.remove("hidden");
 
-    document.getElementById("timer")
-    .classList.remove("hidden");
+document.getElementById("timer")
+.classList.remove("hidden");
 
-    // FULL SCREEN
+// FULL SCREEN
 
-    if(document.documentElement.requestFullscreen){
+if(document.documentElement.requestFullscreen){
 
-        document.documentElement.requestFullscreen();
-    }
+document.documentElement.requestFullscreen();
+}
 
-    loadQuestions();
+loadQuestions();
 
-    startTimer();
+startTimer();
 }
 
 // LOAD QUESTIONS
 
 function loadQuestions(){
 
-    let html = "";
+let html = "";
 
-    questions.forEach((q,index)=>{
+questions.forEach((q,index)=>{
 
-        html += `
-        <div class="question">
+html += `
+<div class="question">
 
-            <h3>
-            ${index+1}. ${q.q}
-            </h3>
-        `;
+<h3>
+${index+1}. ${q.q}
+</h3>
+`;
 
-        q.options.forEach((opt,i)=>{
+q.options.forEach((opt,i)=>{
 
-            const letter =
-            ["A","B","C","D"][i];
+const letter =
+["A","B","C","D"][i];
 
-            html += `
-            <div class="option">
+html += `
+<div class="option">
 
-                <label>
+<label>
 
-                    <input
-                    type="radio"
-                    name="q${index}"
-                    value="${letter}">
+<input
+type="radio"
+name="q${index}"
+value="${letter}">
 
-                    ${letter}) ${opt}
+${letter}) ${opt}
 
-                </label>
+</label>
 
-            </div>
-            `;
-        });
+</div>
+`;
+});
 
-        html += `</div>`;
-    });
+html += `</div>`;
+});
 
-    document.getElementById("questions")
-    .innerHTML = html;
+document.getElementById("questions")
+.innerHTML = html;
 }
 
 // TIMER
 
 function startTimer(){
 
-    timer = setInterval(()=>{
+timer = setInterval(()=>{
 
-        let minutes =
-        Math.floor(timeLeft / 60);
+let minutes =
+Math.floor(timeLeft / 60);
 
-        let seconds =
-        timeLeft % 60;
+let seconds =
+timeLeft % 60;
 
-        document.getElementById("timer")
-        .innerText =
+document.getElementById("timer")
+.innerText =
 
-        `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+`${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
 
-        timeLeft--;
+timeLeft--;
 
-        if(timeLeft < 0){
+if(timeLeft < 0){
 
-            clearInterval(timer);
+clearInterval(timer);
 
-            submitExam();
-        }
+submitExam();
+}
 
-    },1000);
+},1000);
 }
 
 // SUBMIT EXAM
 
 function submitExam(){
 
-    clearInterval(timer);
+clearInterval(timer);
 
-    let score = 0;
+let score = 0;
 
-    questions.forEach((q,index)=>{
+questions.forEach((q,index)=>{
 
-        let selected = document.querySelector(
-        `input[name="q${index}"]:checked`
-        );
+let selected = document.querySelector(
+`input[name="q${index}"]:checked`
+);
 
-        if(selected &&
-           selected.value === q.answer){
+if(selected &&
+selected.value === q.answer){
 
-            score++;
-        }
-    });
+score++;
+}
+});
 
-    // RIGHT & WRONG
+// CORRECT & WRONG
 
-    let correct = score;
+let correct = score;
 
-    let wrong = 50 - score;
+let wrong = 50 - score;
 
-    // PERCENTAGE
+// PERCENTAGE
 
-    let percentage =
-    (score / 50) * 100;
+let percentage =
+(score / 50) * 100;
 
-    // PASS FAIL
+// PASS FAIL
 
-    let result =
-    percentage >= 60
-    ? "PASS"
-    : "FAIL";
+let result =
+percentage >= 60
+? "PASS"
+: "FAIL";
 
-    const data = {
+// SEND DATA
 
-        name:
-        document.getElementById("name").value,
+const data = {
 
-        mobile:
-        document.getElementById("mobile").value,
+name:
+document.getElementById("name").value,
 
-        email:
-        document.getElementById("email").value,
+mobile:
+document.getElementById("mobile").value,
 
-        score: score,
+email:
+document.getElementById("email").value,
 
-        correct: correct,
+score: score,
 
-        wrong: wrong,
+correct: correct,
 
-        result: result,
+wrong: wrong,
 
-        timeTaken:
-        (60*60 - timeLeft) + " Seconds"
-    };
+result: result,
 
-    fetch(scriptURL, {
+timeTaken:
+(60*60 - timeLeft) + " Seconds"
+};
 
-        method: "POST",
+fetch(scriptURL, {
 
-        body: JSON.stringify(data)
+method: "POST",
 
-    })
+body: JSON.stringify(data)
 
-    .then(()=>{
+})
 
-        document.getElementById("examPage")
-        .classList.add("hidden");
+.then(()=>{
 
-        document.getElementById("timer")
-        .classList.add("hidden");
+document.getElementById("examPage")
+.classList.add("hidden");
 
-        document.getElementById("thankPage")
-        .classList.remove("hidden");
+document.getElementById("timer")
+.classList.add("hidden");
 
-    })
+document.getElementById("thankPage")
+.classList.remove("hidden");
 
-    .catch(()=>{
+})
 
-        alert("Error saving result");
-    });
+.catch(()=>{
+
+alert("Error saving result");
+});
 }
 
 // DISABLE RIGHT CLICK
@@ -530,45 +533,45 @@ document.addEventListener(
 'visibilitychange',
 function(){
 
-    if(document.hidden && examStarted){
+if(document.hidden && examStarted){
 
-        warningCount++;
+warningCount++;
 
-        alert(
-        "Warning: Tab switching detected! Attempt: "
-        + warningCount
-        );
+alert(
+"Warning: Tab switching detected! Attempt: "
++ warningCount
+);
 
-        if(warningCount >= 3){
+if(warningCount >= 3){
 
-            alert("Exam Auto Submitted");
+alert("Exam Auto Submitted");
 
-            submitExam();
-        }
-    }
+submitExam();
+}
+}
 });
 
 // DISABLE F12
 
 document.onkeydown = function(e) {
 
-    if(event.keyCode == 123) {
+if(event.keyCode == 123) {
 
-        return false;
-    }
+return false;
+}
 
-    if(e.ctrlKey &&
-       e.shiftKey &&
-       e.keyCode == 'I'.charCodeAt(0)) {
+if(e.ctrlKey &&
+e.shiftKey &&
+e.keyCode == 'I'.charCodeAt(0)) {
 
-        return false;
-    }
+return false;
+}
 
-    if(e.ctrlKey &&
-       e.keyCode == 'U'.charCodeAt(0)) {
+if(e.ctrlKey &&
+e.keyCode == 'U'.charCodeAt(0)) {
 
-        return false;
-    }
+return false;
+}
 }
 
 </script>
