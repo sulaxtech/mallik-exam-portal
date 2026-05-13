@@ -1,64 +1,575 @@
 <!DOCTYPE html>
-let result = percentage >= 60 ? "PASS" : "FAIL";
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mallik Engineering Online Exam</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0b0f1a;
+    color:white;
+}
+
+.header{
+    background:#111827;
+    padding:15px;
+    text-align:center;
+}
+
+.logo{
+    width:120px;
+    margin-bottom:10px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:#111827;
+    padding:20px;
+    border-radius:12px;
+    margin-top:20px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+    margin-top:15px;
+    font-size:16px;
+}
+
+.question{
+    margin-top:20px;
+    padding:15px;
+    background:#1f2937;
+    border-radius:10px;
+}
+
+.option{
+    margin-top:10px;
+}
+
+.timer{
+    position:fixed;
+    top:10px;
+    right:10px;
+    background:red;
+    color:white;
+    padding:10px 20px;
+    border-radius:10px;
+    font-size:20px;
+    z-index:999;
+}
+
+.hidden{
+    display:none;
+}
+
+.warning{
+    color:#f87171;
+    font-size:14px;
+    margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<img src="mallik logo -1.jpg" class="logo">
+
+<h1>Mallik Engineering (India) Pvt Ltd</h1>
+
+<h2>Aptitude & Technical Evaluation</h2>
+
+</div>
+
+<div class="timer hidden" id="timer">
+60:00
+</div>
+
+<div class="container">
+
+<div class="card" id="loginPage">
+
+<h2>Candidate Login</h2>
+
+<input type="text" id="name" placeholder="Candidate Name">
+
+<input type="text" id="mobile" placeholder="Mobile Number">
+
+<input type="email" id="email" placeholder="Email ID">
+
+<div class="warning">
+⚠ Do not switch tabs or minimize window during exam.
+</div>
+
+<button onclick="startExam()">
+Start Exam
+</button>
+
+</div>
+
+<div class="card hidden" id="examPage">
+
+<h2>Online Examination</h2>
+
+<div id="questions"></div>
+
+<button onclick="submitExam()">
+Submit Exam
+</button>
+
+</div>
+
+<div class="card hidden" id="thankPage">
+
+<h1 style="text-align:center;color:#22c55e;">
+Thank you for attending the evaluation
+</h1>
+
+</div>
+
+</div>
+
+<script>
+
+const scriptURL =
+"https://script.google.com/macros/s/AKfycbzjFTMrlvGt31cBs6S5vKgetC7SvneuxJD6tjg82ezsDOILH1BuqoBqV99scZZ8pPga/exec";
+
+let examStarted = false;
+let warningCount = 0;
+let timeLeft = 60 * 60;
+let timer;
+
+// QUESTIONS
+
+const questions = [
+
+{
+q:"Name the angle of projection_____________",
+options:[
+"1st angle projection",
+"2nd angle projection",
+"3rd angle projection",
+"4th angle projection"
+],
+answer:"C"
+},
+
+{
+q:"ISO 14000 quality standard is related with",
+options:[
+"Environmental management systems",
+"Automotive quality standards",
+"Eliminating poor quality",
+"Customer satisfaction"
+],
+answer:"A"
+},
+
+{
+q:"The cold chisels are made by",
+options:[
+"drawing",
+"rolling",
+"piercing",
+"forging"
+],
+answer:"D"
+},
+
+{
+q:"The range of a projectile is maximum when angle is",
+options:[
+"30°",
+"45°",
+"60°",
+"90°"
+],
+answer:"B"
+},
+
+{
+q:"2nd S in 5S is",
+options:[
+"Sorting out",
+"Sustain",
+"Set in order",
+"Standardization"
+],
+answer:"C"
+},
+
+{
+q:"1 inch is",
+options:[
+"24.5mm",
+"25.4mm",
+"2.54mm",
+"0.254mm"
+],
+answer:"B"
+},
+
+{
+q:"Unit of strain is",
+options:[
+"mm",
+"Kg",
+"Degree centigrade",
+"None of these"
+],
+answer:"D"
+},
+
+{
+q:"A carburettor is used to supply",
+options:[
+"petrol air and lubricating oil",
+"air and diesel",
+"petrol and lubricating oil",
+"petrol and air"
+],
+answer:"D"
+},
+
+{
+q:"The unit of angular acceleration is",
+options:[
+"N-m",
+"m/s",
+"m/s2",
+"rad/s2"
+],
+answer:"D"
+},
+
+{
+q:"Which material has maximum ductility?",
+options:[
+"Mild steel",
+"Copper",
+"Nickel",
+"Aluminium"
+],
+answer:"A"
+}
+
+];
+
+// MAKE 50 QUESTIONS
+
+while(questions.length < 50){
+
+questions.push(...questions.slice(0,10));
+
+}
+
+questions.length = 50;
+
+// RANDOMIZE QUESTIONS
+
+questions.sort(() => Math.random() - 0.5);
+
+// START EXAM
+
+function startExam(){
+
+const name =
+document.getElementById("name").value.trim();
+
+const mobile =
+document.getElementById("mobile").value.trim();
+
+const email =
+document.getElementById("email").value.trim();
+
+if(!name || !mobile || !email){
+
+alert("Please fill all details");
+
+return;
+}
+
+examStarted = true;
+
+document.getElementById("loginPage")
+.classList.add("hidden");
+
+document.getElementById("examPage")
+.classList.remove("hidden");
+
+document.getElementById("timer")
+.classList.remove("hidden");
+
+// FULL SCREEN
+
+if(document.documentElement.requestFullscreen){
+
+document.documentElement.requestFullscreen();
+}
+
+loadQuestions();
+
+startTimer();
+}
+
+// LOAD QUESTIONS
+
+function loadQuestions(){
+
+let html = "";
+
+questions.forEach((q,index)=>{
+
+html += `
+<div class="question">
+
+<h3>
+${index+1}. ${q.q}
+</h3>
+`;
+
+q.options.forEach((opt,i)=>{
+
+const letter =
+["A","B","C","D"][i];
+
+html += `
+<div class="option">
+
+<label>
+
+<input
+type="radio"
+name="q${index}"
+value="${letter}">
+
+${letter}) ${opt}
+
+</label>
+
+</div>
+`;
+});
+
+html += `</div>`;
+});
+
+document.getElementById("questions")
+.innerHTML = html;
+}
+
+// TIMER
+
+function startTimer(){
+
+timer = setInterval(()=>{
+
+let minutes =
+Math.floor(timeLeft / 60);
+
+let seconds =
+timeLeft % 60;
+
+document.getElementById("timer")
+.innerText =
+
+`${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+
+timeLeft--;
+
+if(timeLeft < 0){
+
+clearInterval(timer);
+
+submitExam();
+}
+
+},1000);
+}
+
+// SUBMIT EXAM
+
+function submitExam(){
+
+clearInterval(timer);
+
+let score = 0;
+
+questions.forEach((q,index)=>{
+
+let selected = document.querySelector(
+`input[name="q${index}"]:checked`
+);
+
+if(selected &&
+selected.value === q.answer){
+
+score++;
+}
+});
+
+// CORRECT & WRONG
+
+let correct = score;
+
+let wrong = 50 - score;
+
+// PERCENTAGE
+
+let percentage =
+(score / 50) * 100;
+
+// PASS FAIL
+
+let result =
+percentage >= 60
+? "PASS"
+: "FAIL";
+
+// SEND DATA
 
 const data = {
-name: document.getElementById("name").value,
-mobile: document.getElementById("mobile").value,
-email: document.getElementById("email").value,
+
+name:
+document.getElementById("name").value,
+
+mobile:
+document.getElementById("mobile").value,
+
+email:
+document.getElementById("email").value,
+
 score: score,
+
 correct: correct,
+
 wrong: wrong,
+
 result: result,
-timeTaken: (60*60 - timeLeft) + " Seconds",
-photo: capturePhoto()
+
+timeTaken:
+(60*60 - timeLeft) + " Seconds"
 };
 
 fetch(scriptURL, {
+
 method: "POST",
+
 body: JSON.stringify(data)
+
 })
+
 .then(()=>{
 
-document.getElementById("examPage").classList.add("hidden");
-document.getElementById("timer").classList.add("hidden");
-document.getElementById("thankPage").classList.remove("hidden");
+document.getElementById("examPage")
+.classList.add("hidden");
+
+document.getElementById("timer")
+.classList.add("hidden");
+
+document.getElementById("thankPage")
+.classList.remove("hidden");
 
 })
+
 .catch(()=>{
+
 alert("Error saving result");
 });
 }
 
-document.addEventListener('contextmenu', event => event.preventDefault());
-document.addEventListener('copy', event => event.preventDefault());
-document.addEventListener('cut', event => event.preventDefault());
-document.addEventListener('paste', event => event.preventDefault());
+// DISABLE RIGHT CLICK
 
-document.addEventListener('visibilitychange', function(){
+document.addEventListener(
+'contextmenu',
+event => event.preventDefault()
+);
+
+// DISABLE COPY
+
+document.addEventListener(
+'copy',
+event => event.preventDefault()
+);
+
+document.addEventListener(
+'cut',
+event => event.preventDefault()
+);
+
+document.addEventListener(
+'paste',
+event => event.preventDefault()
+);
+
+// TAB SWITCH WARNING
+
+document.addEventListener(
+'visibilitychange',
+function(){
 
 if(document.hidden && examStarted){
+
 warningCount++;
 
-alert("Warning: Tab switching detected! Attempt: " + warningCount);
+alert(
+"Warning: Tab switching detected! Attempt: "
++ warningCount
+);
 
 if(warningCount >= 3){
+
 alert("Exam Auto Submitted");
+
 submitExam();
 }
 }
 });
 
+// DISABLE F12
+
 document.onkeydown = function(e) {
 
 if(event.keyCode == 123) {
+
 return false;
 }
 
-if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+if(e.ctrlKey &&
+e.shiftKey &&
+e.keyCode == 'I'.charCodeAt(0)) {
+
 return false;
 }
 
-if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+if(e.ctrlKey &&
+e.keyCode == 'U'.charCodeAt(0)) {
+
 return false;
 }
 }
