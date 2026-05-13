@@ -137,7 +137,7 @@ video{
 
 <div class="container">
 
-<!-- LOGIN PAGE -->
+<!-- LOGIN -->
 
 <div class="card" id="loginPage">
 
@@ -159,7 +159,8 @@ Start Exam
 
 </div>
 
-<!-- EXAM PAGE -->
+
+<!-- EXAM -->
 
 <div class="card hidden" id="examPage">
 
@@ -175,7 +176,8 @@ Submit Exam
 
 </div>
 
-<!-- THANK YOU PAGE -->
+
+<!-- THANK YOU -->
 
 <div class="card hidden" id="thankPage">
 
@@ -195,19 +197,20 @@ Mallik Engineering Online Assessment Portal
 
 </div>
 
+
 <script>
 
-// =========================================
+// ======================================
 // APPS SCRIPT URL
-// =========================================
+// ======================================
 
 const scriptURL =
 "https://script.google.com/macros/s/AKfycbyNelnexqcjj6QJOoKN8XUPqTIAFVCCkMmtrRfi-YTN5YfKUVWnggH6TBX8Y08a8klz/exec";
 
 
-// =========================================
-// GLOBAL VARIABLES
-// =========================================
+// ======================================
+// VARIABLES
+// ======================================
 
 let questions = [];
 
@@ -222,9 +225,9 @@ let timeLeft = 60 * 60;
 let timer;
 
 
-// =========================================
+// ======================================
 // START EXAM
-// =========================================
+// ======================================
 
 async function startExam(){
 
@@ -242,21 +245,21 @@ if(!name || !mobile || !email){
 alert("Please fill all details");
 
 return;
+
 }
 
 try{
 
 const response =
-await fetch(scriptURL + "?t=" + new Date().getTime());
+await fetch(scriptURL);
 
-if(!response.ok){
+const text =
+await response.text();
 
-throw new Error("Question loading failed");
-
-}
+console.log(text);
 
 const allQuestions =
-await response.json();
+JSON.parse(text);
 
 questions = allQuestions
 .sort(() => Math.random() - 0.5)
@@ -267,6 +270,7 @@ if(questions.length === 0){
 alert("No questions found");
 
 return;
+
 }
 
 examStarted = true;
@@ -280,20 +284,17 @@ document.getElementById("examPage")
 document.getElementById("timer")
 .classList.remove("hidden");
 
+loadQuestions();
 
-// FULL SCREEN
+startTimer();
+
+startWebcam();
 
 if(document.documentElement.requestFullscreen){
 
 document.documentElement.requestFullscreen();
 
 }
-
-loadQuestions();
-
-startTimer();
-
-startWebcam();
 
 }catch(error){
 
@@ -306,9 +307,9 @@ alert("Unable to load questions");
 }
 
 
-// =========================================
+// ======================================
 // LOAD QUESTIONS
-// =========================================
+// ======================================
 
 function loadQuestions(){
 
@@ -317,11 +318,13 @@ let html = "";
 questions.forEach((q,index)=>{
 
 html += `
+
 <div class="question">
 
 <h3>
 ${index+1}. ${q.q}
 </h3>
+
 `;
 
 q.options.forEach((opt,i)=>{
@@ -330,6 +333,7 @@ const letter =
 ["A","B","C","D"][i];
 
 html += `
+
 <div class="option">
 
 <label>
@@ -344,6 +348,7 @@ ${letter}) ${opt}
 </label>
 
 </div>
+
 `;
 
 });
@@ -358,9 +363,9 @@ document.getElementById("questions")
 }
 
 
-// =========================================
+// ======================================
 // TIMER
-// =========================================
+// ======================================
 
 function startTimer(){
 
@@ -394,9 +399,9 @@ timeLeft--;
 }
 
 
-// =========================================
+// ======================================
 // WEBCAM
-// =========================================
+// ======================================
 
 function startWebcam(){
 
@@ -419,9 +424,9 @@ console.log(err);
 }
 
 
-// =========================================
+// ======================================
 // SUBMIT EXAM
-// =========================================
+// ======================================
 
 async function submitExam(){
 
@@ -435,7 +440,8 @@ let score = 0;
 
 questions.forEach((q,index)=>{
 
-let selected = document.querySelector(
+let selected =
+document.querySelector(
 `input[name="q${index}"]:checked`
 );
 
@@ -450,10 +456,11 @@ score++;
 
 let correct = score;
 
-let wrong = questions.length - score;
+let wrong =
+questions.length - score;
 
 let percentage =
-(score / questions.length) * 100;
+(score/questions.length)*100;
 
 let result =
 percentage >= 60
@@ -472,13 +479,13 @@ document.getElementById("mobile").value,
 email:
 document.getElementById("email").value,
 
-score: score,
+score:score,
 
-correct: correct,
+correct:correct,
 
-wrong: wrong,
+wrong:wrong,
 
-result: result,
+result:result,
 
 timeTaken:
 (3600 - timeLeft)
@@ -488,18 +495,17 @@ timeTaken:
 
 try{
 
-await fetch(scriptURL, {
+await fetch(scriptURL,{
 
-method: "POST",
+method:"POST",
 
-headers: {
+headers:{
 "Content-Type":"application/json"
 },
 
-body: JSON.stringify(data)
+body:JSON.stringify(data)
 
 });
-
 
 document.getElementById("examPage")
 .classList.add("hidden");
@@ -509,7 +515,6 @@ document.getElementById("timer")
 
 document.getElementById("thankPage")
 .classList.remove("hidden");
-
 
 }catch(error){
 
@@ -522,39 +527,9 @@ alert("Error saving result");
 }
 
 
-// =========================================
-// DISABLE RIGHT CLICK
-// =========================================
-
-document.addEventListener(
-'contextmenu',
-event => event.preventDefault()
-);
-
-
-// =========================================
-// DISABLE COPY / PASTE
-// =========================================
-
-document.addEventListener(
-'copy',
-event => event.preventDefault()
-);
-
-document.addEventListener(
-'cut',
-event => event.preventDefault()
-);
-
-document.addEventListener(
-'paste',
-event => event.preventDefault()
-);
-
-
-// =========================================
+// ======================================
 // TAB SWITCH WARNING
-// =========================================
+// ======================================
 
 document.addEventListener(
 'visibilitychange',
@@ -582,9 +557,39 @@ submitExam();
 });
 
 
-// =========================================
-// DISABLE F12 / DEVTOOLS
-// =========================================
+// ======================================
+// DISABLE RIGHT CLICK
+// ======================================
+
+document.addEventListener(
+'contextmenu',
+event => event.preventDefault()
+);
+
+
+// ======================================
+// DISABLE COPY / PASTE
+// ======================================
+
+document.addEventListener(
+'copy',
+event => event.preventDefault()
+);
+
+document.addEventListener(
+'cut',
+event => event.preventDefault()
+);
+
+document.addEventListener(
+'paste',
+event => event.preventDefault()
+);
+
+
+// ======================================
+// DISABLE F12
+// ======================================
 
 document.onkeydown = function(e) {
 
