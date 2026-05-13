@@ -91,9 +91,12 @@ display:none;
 
 video{
 width:240px;
+height:180px;
 border-radius:12px;
 border:2px solid white;
 margin-top:20px;
+background:black;
+object-fit:cover;
 }
 
 .warning{
@@ -105,6 +108,12 @@ margin-top:10px;
 text-align:center;
 margin-top:30px;
 color:#9ca3af;
+}
+
+.loading{
+margin-top:20px;
+font-size:18px;
+color:#60a5fa;
 }
 
 </style>
@@ -187,6 +196,11 @@ style="display:none">
 
 <div id="faceStatus"></div>
 
+<div id="loading"
+class="loading">
+Loading questions...
+</div>
+
 <div id="questions"></div>
 
 <button onclick="submitExam()">
@@ -267,9 +281,30 @@ return;
 
 }
 
-await startWebcam();
 
-await loadFaceModels();
+// OPEN EXAM PAGE FAST
+
+document.getElementById(
+"loginPage"
+).classList.add("hidden");
+
+document.getElementById(
+"examPage"
+).classList.remove("hidden");
+
+document.getElementById(
+"timer"
+).classList.remove("hidden");
+
+
+// START WEBCAM
+
+startWebcam();
+
+
+// LOAD QUESTIONS
+
+try{
 
 const response =
 await fetch(scriptURL);
@@ -284,13 +319,39 @@ allQuestions
 
 loadQuestions();
 
+document.getElementById(
+"loading"
+).style.display = "none";
+
+}catch(error){
+
+alert("Unable to load questions");
+
+console.log(error);
+
+}
+
+
+// LOAD FACE API BACKGROUND
+
+loadFaceModels()
+.then(()=>{
+
+startFaceMonitoring();
+
+});
+
+
+// START EXAM
+
 examStarted = true;
 
 startTimer();
 
 startAutoCapture();
 
-startFaceMonitoring();
+
+// FULLSCREEN
 
 if(document.documentElement
 .requestFullscreen){
@@ -299,18 +360,6 @@ document.documentElement
 .requestFullscreen();
 
 }
-
-document.getElementById(
-"loginPage"
-).classList.add("hidden");
-
-document.getElementById(
-"examPage"
-).classList.remove("hidden");
-
-document.getElementById(
-"timer"
-).classList.remove("hidden");
 
 }
 
@@ -408,16 +457,19 @@ timeLeft--;
 
 
 // =====================================
-// WEBCAM
+// START WEBCAM
 // =====================================
 
 async function startWebcam(){
+
+try{
 
 const stream =
 
 await navigator.mediaDevices
 .getUserMedia({
-video:true
+video:true,
+audio:false
 });
 
 const video =
@@ -426,6 +478,18 @@ document.getElementById(
 );
 
 video.srcObject = stream;
+
+video.play();
+
+}catch(error){
+
+alert(
+"Please allow webcam permission"
+);
+
+console.log(error);
+
+}
 
 }
 
@@ -477,7 +541,7 @@ capturedPhotos.push(image);
 
 
 // =====================================
-// FACE API
+// LOAD FACE MODEL
 // =====================================
 
 async function loadFaceModels(){
@@ -538,7 +602,7 @@ showWarning(
 
 
 // =====================================
-// WARNINGS
+// WARNING
 // =====================================
 
 function showWarning(message){
