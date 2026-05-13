@@ -3,116 +3,108 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mallik Engineering Online Exam</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Mallik Engineering Online Exam
+</title>
+
+<script defer
+src="https://cdn.jsdelivr.net/npm/face-api.js">
+</script>
 
 <style>
 
 body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#0b0f1a;
-    color:white;
+margin:0;
+font-family:Arial;
+background:#0b0f1a;
+color:white;
 }
 
 .header{
-    background:#111827;
-    text-align:center;
-    padding:20px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.5);
+background:#111827;
+padding:20px;
+text-align:center;
 }
 
 .logo{
-    width:140px;
-    margin-bottom:10px;
+width:140px;
 }
 
 .container{
-    max-width:1000px;
-    margin:auto;
-    padding:20px;
+max-width:1000px;
+margin:auto;
+padding:20px;
 }
 
 .card{
-    background:#111827;
-    border-radius:12px;
-    padding:20px;
-    margin-top:20px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.4);
+background:#111827;
+padding:20px;
+border-radius:12px;
+margin-top:20px;
 }
 
 input{
-    width:100%;
-    padding:12px;
-    margin-top:12px;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-    box-sizing:border-box;
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+box-sizing:border-box;
 }
 
 button{
-    background:#2563eb;
-    color:white;
-    border:none;
-    padding:12px 25px;
-    border-radius:8px;
-    font-size:16px;
-    cursor:pointer;
-    margin-top:20px;
-}
-
-button:hover{
-    background:#1d4ed8;
+padding:12px 25px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+margin-top:20px;
+cursor:pointer;
 }
 
 .question{
-    background:#1f2937;
-    padding:15px;
-    border-radius:10px;
-    margin-top:20px;
-}
-
-.option{
-    margin-top:10px;
+background:#1f2937;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
 }
 
 .timer{
-    position:fixed;
-    top:10px;
-    right:10px;
-    background:red;
-    color:white;
-    padding:12px 20px;
-    border-radius:10px;
-    font-size:22px;
-    z-index:999;
-    font-weight:bold;
+position:fixed;
+top:10px;
+right:10px;
+background:red;
+padding:12px 20px;
+border-radius:10px;
+font-size:22px;
+font-weight:bold;
+z-index:999;
 }
 
 .hidden{
-    display:none;
-}
-
-.warning{
-    color:#f87171;
-    margin-top:10px;
-    font-size:14px;
-}
-
-.footer{
-    text-align:center;
-    margin-top:30px;
-    color:#9ca3af;
-    font-size:14px;
+display:none;
 }
 
 video{
-    width:220px;
-    border-radius:10px;
-    border:2px solid white;
-    margin-top:20px;
+width:240px;
+border-radius:12px;
+border:2px solid white;
+margin-top:20px;
+}
+
+.warning{
+color:#ff8080;
+margin-top:10px;
+}
+
+.footer{
+text-align:center;
+margin-top:30px;
+color:#9ca3af;
 }
 
 </style>
@@ -123,32 +115,48 @@ video{
 
 <div class="header">
 
-<img src="mallik-logo.jpg" class="logo">
+<img src="mallik-logo.jpg"
+class="logo">
 
-<h1>Mallik Engineering (India) Pvt Ltd</h1>
+<h1>
+Mallik Engineering (India) Pvt Ltd
+</h1>
 
-<h2>Aptitude & Technical Evaluation</h2>
+<h2>
+Advanced Online Exam Portal
+</h2>
 
 </div>
 
-<div class="timer hidden" id="timer">
+<div class="timer hidden"
+id="timer">
 60:00
 </div>
 
 <div class="container">
 
-<div class="card" id="loginPage">
+<div class="card"
+id="loginPage">
 
-<h2>Candidate Login</h2>
+<h2>
+Candidate Login
+</h2>
 
-<input type="text" id="name" placeholder="Candidate Name">
+<input type="text"
+id="name"
+placeholder="Candidate Name">
 
-<input type="text" id="mobile" placeholder="Mobile Number">
+<input type="text"
+id="mobile"
+placeholder="Mobile Number">
 
-<input type="email" id="email" placeholder="Email ID">
+<input type="email"
+id="email"
+placeholder="Email ID">
 
 <div class="warning">
-⚠ Do not switch tabs or minimize during exam.
+⚠ Webcam required.
+Tab switching prohibited.
 </div>
 
 <button onclick="startExam()">
@@ -158,11 +166,26 @@ Start Exam
 </div>
 
 
-<div class="card hidden" id="examPage">
+<div class="card hidden"
+id="examPage">
 
-<h2>Online Examination</h2>
+<h2>
+Online Examination
+</h2>
 
-<video id="webcam" autoplay muted playsinline></video>
+<video id="webcam"
+autoplay
+muted
+playsinline>
+</video>
+
+<canvas id="canvas"
+width="320"
+height="240"
+style="display:none">
+</canvas>
+
+<div id="faceStatus"></div>
 
 <div id="questions"></div>
 
@@ -173,14 +196,20 @@ Submit Exam
 </div>
 
 
-<div class="card hidden" id="thankPage">
+<div class="card hidden"
+id="thankPage">
 
-<h1 style="text-align:center;color:#22c55e;">
-Thank You For Attending The Evaluation
+<h1 style="
+color:#22c55e;
+text-align:center;
+">
+Thank You
 </h1>
 
-<h3 style="text-align:center;">
-Your response has been recorded successfully.
+<h3 style="
+text-align:center;
+">
+Your response has been recorded.
 </h3>
 
 </div>
@@ -198,11 +227,18 @@ const scriptURL =
 "https://script.google.com/macros/s/AKfycbyhY5V4Civ8o4YWNC87naanMNNUPfFbsi-n8SGrwDBULTryUvWj6h9sV3hh7KzmrahpVw/exec";
 
 let questions = [];
-let examStarted = false;
+
 let submitted = false;
-let warningCount = 0;
-let timeLeft = 60 * 60;
+
+let examStarted = false;
+
 let timer;
+
+let timeLeft = 3600;
+
+let warningCount = 0;
+
+let capturedPhotos = [];
 
 
 // =====================================
@@ -212,23 +248,28 @@ let timer;
 async function startExam(){
 
 const name =
-document.getElementById("name").value.trim();
+document.getElementById("name")
+.value.trim();
 
 const mobile =
-document.getElementById("mobile").value.trim();
+document.getElementById("mobile")
+.value.trim();
 
 const email =
-document.getElementById("email").value.trim();
+document.getElementById("email")
+.value.trim();
 
 if(!name || !mobile || !email){
 
-alert("Please fill all details");
+alert("Fill all details");
 
 return;
 
 }
 
-try{
+await startWebcam();
+
+await loadFaceModels();
 
 const response =
 await fetch(scriptURL);
@@ -236,48 +277,40 @@ await fetch(scriptURL);
 const allQuestions =
 await response.json();
 
-questions = allQuestions
+questions =
+allQuestions
 .sort(() => Math.random() - 0.5)
 .slice(0,50);
 
-if(questions.length === 0){
-
-alert("No questions found");
-
-return;
-
-}
+loadQuestions();
 
 examStarted = true;
 
-document.getElementById("loginPage")
-.classList.add("hidden");
-
-document.getElementById("examPage")
-.classList.remove("hidden");
-
-document.getElementById("timer")
-.classList.remove("hidden");
-
-loadQuestions();
-
 startTimer();
 
-startWebcam();
+startAutoCapture();
 
-if(document.documentElement.requestFullscreen){
+startFaceMonitoring();
 
-document.documentElement.requestFullscreen();
+if(document.documentElement
+.requestFullscreen){
 
-}
-
-}catch(error){
-
-console.log(error);
-
-alert("Unable to load questions");
+document.documentElement
+.requestFullscreen();
 
 }
+
+document.getElementById(
+"loginPage"
+).classList.add("hidden");
+
+document.getElementById(
+"examPage"
+).classList.remove("hidden");
+
+document.getElementById(
+"timer"
+).classList.remove("hidden");
 
 }
 
@@ -309,8 +342,6 @@ const letter =
 
 html += `
 
-<div class="option">
-
 <label>
 
 <input
@@ -322,7 +353,7 @@ ${letter}) ${opt}
 
 </label>
 
-</div>
+<br><br>
 
 `;
 
@@ -332,8 +363,9 @@ html += `</div>`;
 
 });
 
-document.getElementById("questions")
-.innerHTML = html;
+document.getElementById(
+"questions"
+).innerHTML = html;
 
 }
 
@@ -348,8 +380,6 @@ timer = setInterval(()=>{
 
 if(timeLeft <= 0){
 
-clearInterval(timer);
-
 submitExam();
 
 return;
@@ -357,15 +387,18 @@ return;
 }
 
 let minutes =
-Math.floor(timeLeft / 60);
+Math.floor(timeLeft/60);
 
 let seconds =
 timeLeft % 60;
 
-document.getElementById("timer")
-.innerText =
+document.getElementById(
+"timer"
+).innerText =
 
-`${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+`${String(minutes)
+.padStart(2,'0')}:${String(seconds)
+.padStart(2,'0')}`;
 
 timeLeft--;
 
@@ -378,25 +411,175 @@ timeLeft--;
 // WEBCAM
 // =====================================
 
-function startWebcam(){
+async function startWebcam(){
 
-navigator.mediaDevices
-.getUserMedia({video:true})
+const stream =
 
-.then(stream=>{
-
-document.getElementById("webcam")
-.srcObject = stream;
-
-})
-
-.catch(err=>{
-
-console.log(err);
-
+await navigator.mediaDevices
+.getUserMedia({
+video:true
 });
 
+const video =
+document.getElementById(
+"webcam"
+);
+
+video.srcObject = stream;
+
 }
+
+
+// =====================================
+// AUTO PHOTO CAPTURE
+// =====================================
+
+function startAutoCapture(){
+
+setInterval(()=>{
+
+capturePhoto();
+
+},30000);
+
+}
+
+
+function capturePhoto(){
+
+const video =
+document.getElementById(
+"webcam"
+);
+
+const canvas =
+document.getElementById(
+"canvas"
+);
+
+const ctx =
+canvas.getContext("2d");
+
+ctx.drawImage(
+video,
+0,
+0,
+320,
+240
+);
+
+const image =
+canvas.toDataURL("image/png");
+
+capturedPhotos.push(image);
+
+}
+
+
+// =====================================
+// FACE API
+// =====================================
+
+async function loadFaceModels(){
+
+await faceapi
+.nets
+.tinyFaceDetector
+.loadFromUri(
+'https://justadudewhohacks.github.io/face-api.js/models'
+);
+
+}
+
+
+// =====================================
+// FACE MONITORING
+// =====================================
+
+function startFaceMonitoring(){
+
+setInterval(async()=>{
+
+const video =
+document.getElementById(
+"webcam"
+);
+
+const detections =
+
+await faceapi.detectAllFaces(
+
+video,
+
+new faceapi
+.TinyFaceDetectorOptions()
+
+);
+
+if(detections.length == 0){
+
+showWarning(
+"No face detected"
+);
+
+}
+
+if(detections.length > 1){
+
+showWarning(
+"Multiple persons detected"
+);
+
+}
+
+},5000);
+
+}
+
+
+// =====================================
+// WARNINGS
+// =====================================
+
+function showWarning(message){
+
+warningCount++;
+
+capturePhoto();
+
+alert(message);
+
+if(warningCount >= 3){
+
+alert(
+"Exam Auto Submitted"
+);
+
+submitExam();
+
+}
+
+}
+
+
+// =====================================
+// TAB SWITCH
+// =====================================
+
+document.addEventListener(
+'visibilitychange',
+function(){
+
+if(document.hidden &&
+examStarted){
+
+showWarning(
+"Tab switch detected"
+);
+
+}
+
+});
 
 
 // =====================================
@@ -416,6 +599,7 @@ let score = 0;
 questions.forEach((q,index)=>{
 
 let selected =
+
 document.querySelector(
 `input[name="q${index}"]:checked`
 );
@@ -432,7 +616,7 @@ score++;
 let correct = score;
 
 let wrong =
-questions.length - score;
+questions.length-score;
 
 let percentage =
 (score/questions.length)*100;
@@ -446,13 +630,19 @@ percentage >= 60
 const data = {
 
 name:
-document.getElementById("name").value,
+document.getElementById(
+"name"
+).value,
 
 mobile:
-document.getElementById("mobile").value,
+document.getElementById(
+"mobile"
+).value,
 
 email:
-document.getElementById("email").value,
+document.getElementById(
+"email"
+).value,
 
 score:score,
 
@@ -463,12 +653,12 @@ wrong:wrong,
 result:result,
 
 timeTaken:
-(3600 - timeLeft)
+(3600-timeLeft),
+
+photos:capturedPhotos
 
 };
 
-
-try{
 
 await fetch(scriptURL,{
 
@@ -477,68 +667,28 @@ method:"POST",
 mode:"no-cors",
 
 headers:{
-"Content-Type":"application/json"
+"Content-Type":
+"application/json"
 },
 
 body:JSON.stringify(data)
 
 });
 
-document.getElementById("examPage")
-.classList.add("hidden");
 
-document.getElementById("timer")
-.classList.add("hidden");
+document.getElementById(
+"examPage"
+).classList.add("hidden");
 
-document.getElementById("thankPage")
-.classList.remove("hidden");
+document.getElementById(
+"timer"
+).classList.add("hidden");
 
-}catch(error){
-
-console.log(error);
-
-document.getElementById("examPage")
-.classList.add("hidden");
-
-document.getElementById("timer")
-.classList.add("hidden");
-
-document.getElementById("thankPage")
-.classList.remove("hidden");
+document.getElementById(
+"thankPage"
+).classList.remove("hidden");
 
 }
-
-}
-
-
-// =====================================
-// TAB SWITCH WARNING
-// =====================================
-
-document.addEventListener(
-'visibilitychange',
-function(){
-
-if(document.hidden && examStarted){
-
-warningCount++;
-
-alert(
-"Warning: Tab switching detected! Attempt: "
-+ warningCount
-);
-
-if(warningCount >= 3){
-
-alert("Exam Auto Submitted");
-
-submitExam();
-
-}
-
-}
-
-});
 
 
 // =====================================
@@ -547,52 +697,8 @@ submitExam();
 
 document.addEventListener(
 'contextmenu',
-event => event.preventDefault()
+(event)=>event.preventDefault()
 );
-
-
-// =====================================
-// DISABLE COPY / PASTE
-// =====================================
-
-document.addEventListener(
-'copy',
-event => event.preventDefault()
-);
-
-document.addEventListener(
-'cut',
-event => event.preventDefault()
-);
-
-document.addEventListener(
-'paste',
-event => event.preventDefault()
-);
-
-
-// =====================================
-// DISABLE F12
-// =====================================
-
-document.onkeydown = function(e) {
-
-if(event.keyCode == 123) {
-return false;
-}
-
-if(e.ctrlKey &&
-e.shiftKey &&
-e.keyCode == 'I'.charCodeAt(0)) {
-return false;
-}
-
-if(e.ctrlKey &&
-e.keyCode == 'U'.charCodeAt(0)) {
-return false;
-}
-
-};
 
 </script>
 
