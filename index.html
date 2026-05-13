@@ -5,44 +5,132 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mallik Exam Portal</title>
+<title>Mallik Engineering Online Exam</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
-.container{max-width:900px;margin:auto;padding:20px}
-.card{background:#111827;padding:20px;border-radius:12px;margin-top:20px}
-input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none}
-button{background:#2563eb;color:#fff;cursor:pointer}
-.question{background:#1f2937;padding:15px;margin-top:10px;border-radius:10px}
-.timer{position:fixed;top:10px;right:10px;background:red;padding:10px;border-radius:8px;font-weight:bold}
+
+body{
+margin:0;
+font-family:Arial;
+background:#0b0f1a;
+color:white;
+}
+
+.header{
+background:#111827;
+text-align:center;
+padding:20px;
+}
+
+.logo{
+width:130px;
+margin-bottom:10px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:#111827;
+padding:20px;
+border-radius:12px;
+margin-top:20px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+}
+
+.question{
+background:#1f2937;
+padding:15px;
+margin-top:10px;
+border-radius:10px;
+}
+
+.timer{
+position:fixed;
+top:10px;
+right:10px;
+background:red;
+padding:10px 15px;
+border-radius:8px;
+font-weight:bold;
+}
+
 .hidden{display:none}
-video{width:220px;border-radius:10px;margin-top:10px;background:#000}
+
+video{
+width:220px;
+border-radius:10px;
+margin-top:10px;
+background:black;
+}
+
 </style>
 
 </head>
 
 <body>
 
+<!-- HEADER RESTORED -->
+<div class="header">
+
+<img src="mallik-logo.jpg" class="logo">
+
+<h1>Mallik Engineering (India) Pvt Ltd</h1>
+<h3>Aptitude & Technical Online Exam</h3>
+
+</div>
+
 <div class="timer hidden" id="timer">60:00</div>
 
 <div class="container">
 
+<!-- LOGIN -->
 <div class="card" id="loginPage">
-<h2>Login</h2>
+
+<h2>Candidate Login</h2>
+
 <input id="name" placeholder="Name">
 <input id="mobile" placeholder="Mobile">
 <input id="email" placeholder="Email">
+
 <button onclick="startExam()">Start Exam</button>
+
 </div>
 
+<!-- EXAM -->
 <div class="card hidden" id="examPage">
-<h2>Exam</h2>
+
+<h2>Online Exam</h2>
 
 <video id="webcam" autoplay muted playsinline></video>
 
 <div id="questions"></div>
 
-<button onclick="submitExam()">Submit</button>
+<button onclick="submitExam()">Submit Exam</button>
+
 </div>
 
 </div>
@@ -56,10 +144,19 @@ let questions = [];
 let photos = [];
 let timeLeft = 3600;
 let timer;
-let examStarted = false;
+let started = false;
 
-// START EXAM
+// START EXAM (FIXED)
 async function startExam(){
+
+let name = document.getElementById("name").value;
+let mobile = document.getElementById("mobile").value;
+let email = document.getElementById("email").value;
+
+if(!name || !mobile || !email){
+alert("Fill all details");
+return;
+}
 
 document.getElementById("loginPage").classList.add("hidden");
 document.getElementById("examPage").classList.remove("hidden");
@@ -73,7 +170,7 @@ questions = await res.json();
 
 loadQuestions();
 
-examStarted = true;
+started = true;
 }
 
 // CAMERA
@@ -82,17 +179,27 @@ const stream = await navigator.mediaDevices.getUserMedia({video:true});
 document.getElementById("webcam").srcObject = stream;
 }
 
-// QUESTIONS
+// LOAD QUESTIONS
 function loadQuestions(){
+
 let html = "";
 
 questions.forEach((q,i)=>{
-html += `<div class="question">
-<h3>${i+1}. ${q.q}</h3>`;
+
+html += `
+<div class="question">
+<h3>${i+1}. ${q.q}</h3>
+`;
 
 q.options.forEach((opt,j)=>{
 const letter = ["A","B","C","D"][j];
-html += `<label><input type="radio" name="q${i}" value="${letter}"> ${letter}) ${opt}</label><br>`;
+
+html += `
+<label>
+<input type="radio" name="q${i}" value="${letter}">
+${letter}) ${opt}
+</label><br>
+`;
 });
 
 html += `</div>`;
@@ -104,29 +211,44 @@ document.getElementById("questions").innerHTML = html;
 // TIMER
 function startTimer(){
 timer = setInterval(()=>{
+
 let m = Math.floor(timeLeft/60);
 let s = timeLeft%60;
+
 document.getElementById("timer").innerText =
 `${m}:${s}`;
+
 timeLeft--;
-if(timeLeft<=0) submitExam();
+
+if(timeLeft<=0){
+submitExam();
+}
+
 },1000);
 }
 
-// PHOTO CAPTURE
-function capture(){
-const v = document.getElementById("webcam");
-const c = document.createElement("canvas");
-c.width=320;c.height=240;
-c.getContext("2d").drawImage(v,0,0);
-photos.push(c.toDataURL("image/png"));
+// PHOTO CAPTURE (FIXED SAFE)
+function capturePhoto(){
+
+let video = document.getElementById("webcam");
+
+let canvas = document.createElement("canvas");
+canvas.width = 320;
+canvas.height = 240;
+
+let ctx = canvas.getContext("2d");
+ctx.drawImage(video,0,0,320,240);
+
+photos.push(canvas.toDataURL("image/png"));
 }
 
-// SUBMIT
+// SUBMIT (FIXED)
 async function submitExam(){
 
 clearInterval(timer);
-capture();
+
+// take final photo
+capturePhoto();
 
 let score = 0;
 
@@ -142,20 +264,19 @@ email:document.getElementById("email").value,
 score:score,
 correct:score,
 wrong:questions.length-score,
-result: score >= 50 ? "PASS" : "FAIL",
+result:score>=50?"PASS":"FAIL",
 timeTaken:3600-timeLeft,
 photos:photos
 };
 
 await fetch(scriptURL,{
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify(data)
 });
 
-alert("Submitted Successfully");
+alert("Exam Submitted Successfully");
+
 }
 
 </script>
