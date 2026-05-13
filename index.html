@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mallik Engineering Online Exam</title>
+<title>Mallik Engineering Exam Portal</title>
 
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
 
@@ -24,7 +24,7 @@ text-align:center;
 padding:20px;
 }
 
-.logo{width:130px}
+.logo{width:130px;margin-bottom:10px}
 
 .container{
 max-width:900px;
@@ -45,6 +45,7 @@ padding:12px;
 margin-top:10px;
 border-radius:8px;
 border:none;
+box-sizing:border-box;
 }
 
 button{
@@ -56,6 +57,7 @@ color:white;
 border:none;
 border-radius:8px;
 cursor:pointer;
+font-size:16px;
 }
 
 .question{
@@ -73,20 +75,23 @@ background:red;
 padding:10px 15px;
 border-radius:8px;
 font-weight:bold;
+z-index:999;
 }
 
 .hidden{display:none}
 
 video{
-width:220px;
+width:240px;
+height:180px;
 border-radius:10px;
 margin-top:10px;
 background:black;
+object-fit:cover;
 }
 
 .rules{
 background:#1f2937;
-padding:10px;
+padding:12px;
 border-radius:10px;
 font-size:14px;
 margin-top:10px;
@@ -99,6 +104,7 @@ line-height:1.5;
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
 <img src="mallik-logo.jpg" class="logo">
 <h2>Mallik Engineering (India) Pvt Ltd</h2>
@@ -122,12 +128,12 @@ line-height:1.5;
 <b>Exam Rules:</b><br>
 ✔ No tab switching<br>
 ✔ Webcam must be ON<br>
-✔ No copy/paste<br>
-✔ Multiple face = warning<br>
-✔ No looking away repeatedly<br>
+✔ Multiple face detection warning<br>
+✔ Looking away detection active<br>
+✔ Auto submission on violations<br>
 </div>
 
-<label style="display:block;margin-top:10px;">
+<label>
 <input type="checkbox" id="agree">
 I accept all exam rules
 </label>
@@ -162,17 +168,36 @@ let timeLeft = 3600;
 let timer;
 let examStarted = false;
 
-let warningCount = 0;
-let facePaused = false;
-let multiFaceUsed = false;
-let gazeWarnings = 0;
-let examPaused = false;
+let warning = 0;
+let paused = false;
 
-// ================= START =================
+// ================= CAMERA FIXED =================
+async function startCamera(){
+
+try{
+
+const video = document.getElementById("webcam");
+
+const stream = await navigator.mediaDevices.getUserMedia({
+video: true,
+audio: false
+});
+
+video.srcObject = stream;
+await video.play();
+
+}catch(e){
+alert("Camera permission required");
+console.log(e);
+}
+
+}
+
+// ================= START EXAM =================
 async function startExam(){
 
 if(!document.getElementById("agree").checked){
-alert("Accept exam rules first");
+alert("Please accept rules");
 return;
 }
 
@@ -181,29 +206,27 @@ document.getElementById("examPage").classList.remove("hidden");
 document.getElementById("timer").classList.remove("hidden");
 
 startCamera();
+startTimer();
 
+try{
 const res = await fetch(scriptURL);
 questions = await res.json();
 loadQuestions();
-
-startTimer();
-startAutoCapture();
-startFace();
-startGaze();
-
-examStarted = true;
+}catch(e){
+alert("Question loading failed");
+console.log(e);
 }
 
-// ================= CAMERA =================
-async function startCamera(){
-const stream = await navigator.mediaDevices.getUserMedia({video:true});
-document.getElementById("webcam").srcObject = stream;
+examStarted = true;
+startMonitoring();
+startAutoCapture();
+
 }
 
 // ================= QUESTIONS =================
 function loadQuestions(){
 
-let html = "";
+let html="";
 
 questions.forEach((q,i)=>{
 
@@ -223,105 +246,111 @@ document.getElementById("questions").innerHTML = html;
 
 // ================= TIMER =================
 function startTimer(){
-timer=setInterval(()=>{
+
+timer = setInterval(()=>{
+
+if(paused) return;
+
 let m=Math.floor(timeLeft/60);
 let s=timeLeft%60;
-document.getElementById("timer").innerText=`${m}:${s}`;
+
+document.getElementById("timer").innerText =
+`${m}:${s}`;
+
 timeLeft--;
+
 if(timeLeft<=0) submitExam();
+
 },1000);
+
 }
 
 // ================= PHOTO =================
 function capture(){
-let v=document.getElementById("webcam");
-let c=document.createElement("canvas");
+
+const v=document.getElementById("webcam");
+const c=document.createElement("canvas");
 c.width=320;c.height=240;
 c.getContext("2d").drawImage(v,0,0);
 photos.push(c.toDataURL("image/png"));
+
 }
 
-// ================= FACE AI =================
-function startFace(){
+// ================= AI MONITOR =================
+function startMonitoring(){
 
 setInterval(async()=>{
 
-if(examPaused) return;
+if(!examStarted || paused) return;
 
 const v=document.getElementById("webcam");
 
-const d=await faceapi.detectAllFaces(v,new faceapi.TinyFaceDetectorOptions());
+const d=await faceapi.detectAllFaces(
+v,
+new faceapi.TinyFaceDetectorOptions()
+);
 
 // NO FACE
 if(d.length===0){
-pause("❌ No face detected");
+warn("No face detected");
 }
 
 // MULTIPLE FACE
-if(d.length>1 && !multiFaceUsed){
-multiFaceUsed=true;
-pause("⚠ Multiple face detected (one-time warning)");
-setTimeout(resume,10000);
+if(d.length>1){
+warn("Multiple faces detected");
+}
+
+// GAZE CHECK (basic)
+if(d.length===1 && d[0].box.width < 120){
+warn("Looking away detected");
 }
 
 },4000);
+
 }
 
-// ================= GAZE =================
-function startGaze(){
+// ================= WARNING SYSTEM =================
+function warn(msg){
 
-setInterval(async()=>{
-
-if(examPaused) return;
-
-const v=document.getElementById("webcam");
-
-const d=await faceapi.detectAllFaces(v,new faceapi.TinyFaceDetectorOptions());
-
-if(d.length===1){
-
-let b=d[0].box;
-
-if(b.width<120){
-gazeWarnings++;
+warning++;
 capture();
-alert("👀 Looking away detected");
+alert(msg);
 
-if(gazeWarnings>=3){
-pause("❌ Gaze violation limit reached");
-}
-}
-
+if(warning>=3){
+pauseExam("Too many violations");
 }
 
-},5000);
 }
 
 // ================= PAUSE =================
-function pause(msg){
-examPaused=true;
+function pauseExam(msg){
+paused=true;
 clearInterval(timer);
-capture();
 alert(msg);
 }
 
-// ================= RESUME =================
-function resume(){
-examPaused=false;
-startTimer();
+// ================= AUTO CAPTURE =================
+function startAutoCapture(){
+
+setInterval(()=>{
+if(!paused) capture();
+},30000);
+
 }
 
 // ================= TAB SWITCH =================
 document.addEventListener("visibilitychange",()=>{
+
 if(document.hidden && examStarted){
-capture();
-alert("📵 Tab switch detected");
-pause("Exam paused");
+warn("Tab switch detected");
 }
+
 });
 
-// ================= SUBMIT =================
+// ================= SUBMIT FIXED =================
 async function submitExam(){
+
+try{
 
 clearInterval(timer);
 capture();
@@ -333,10 +362,10 @@ let s=document.querySelector(`input[name="q${i}"]:checked`);
 if(s && s.value===q.answer) score++;
 });
 
-let data={
-name:document.getElementById("name").value,
-mobile:document.getElementById("mobile").value,
-email:document.getElementById("email").value,
+let payload={
+name:name.value,
+mobile:mobile.value,
+email:email.value,
 score,
 correct:score,
 wrong:questions.length-score,
@@ -345,13 +374,23 @@ timeTaken:3600-timeLeft,
 photos
 };
 
-await fetch(scriptURL,{
+const res=await fetch(scriptURL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify(data)
+body:JSON.stringify(payload)
 });
 
-alert("Exam Submitted");
+await res.text();
+
+alert("Exam Submitted Successfully");
+
+}catch(e){
+
+alert("Submit failed");
+console.log(e);
+
+}
+
 }
 
 </script>
