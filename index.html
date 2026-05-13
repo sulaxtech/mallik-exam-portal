@@ -123,8 +123,6 @@ video{
 
 <div class="header">
 
-<!-- YOUR LOGO -->
-
 <img src="mallik-logo.jpg" class="logo">
 
 <h1>Mallik Engineering (India) Pvt Ltd</h1>
@@ -168,7 +166,7 @@ Start Exam
 
 <h2>Online Examination</h2>
 
-<video id="webcam" autoplay muted></video>
+<video id="webcam" autoplay muted playsinline></video>
 
 <div id="questions"></div>
 
@@ -202,17 +200,17 @@ Mallik Engineering Online Assessment Portal
 
 <script>
 
-// =========================================
+// ====================================
 // APPS SCRIPT URL
-// =========================================
+// ====================================
 
 const scriptURL =
-"https://script.google.com/macros/s/AKfycbyNelnexqcjj6QJOoKN8XUPqTIAFVCCkMmtrRfi-YTN5YfKUVWnggH6TBX8Y08a8klz/exec";
+"https://script.google.com/macros/s/AKfycbyhY5V4Civ8o4YWNC87naanMNNUPfFbsi-n8SGrwDBULTryUvWj6h9sV3hh7KzmrahpVw/exec";
 
 
-// =========================================
+// ====================================
 // VARIABLES
-// =========================================
+// ====================================
 
 let questions = [];
 
@@ -227,9 +225,9 @@ let timeLeft = 60 * 60;
 let timer;
 
 
-// =========================================
+// ====================================
 // START EXAM
-// =========================================
+// ====================================
 
 async function startExam(){
 
@@ -255,13 +253,8 @@ try{
 const response =
 await fetch(scriptURL);
 
-const text =
-await response.text();
-
-console.log(text);
-
 const allQuestions =
-JSON.parse(text);
+await response.json();
 
 questions = allQuestions
 .sort(() => Math.random() - 0.5)
@@ -309,9 +302,9 @@ alert("Unable to load questions");
 }
 
 
-// =========================================
+// ====================================
 // LOAD QUESTIONS
-// =========================================
+// ====================================
 
 function loadQuestions(){
 
@@ -365,9 +358,9 @@ document.getElementById("questions")
 }
 
 
-// =========================================
+// ====================================
 // TIMER
-// =========================================
+// ====================================
 
 function startTimer(){
 
@@ -401,9 +394,9 @@ timeLeft--;
 }
 
 
-// =========================================
-// WEBCAM
-// =========================================
+// ====================================
+// START WEBCAM
+// ====================================
 
 function startWebcam(){
 
@@ -426,9 +419,9 @@ console.log(err);
 }
 
 
-// =========================================
+// ====================================
 // SUBMIT EXAM
-// =========================================
+// ====================================
 
 async function submitExam(){
 
@@ -529,9 +522,9 @@ alert("Error saving result");
 }
 
 
-// =========================================
+// ====================================
 // TAB SWITCH WARNING
-// =========================================
+// ====================================
 
 document.addEventListener(
 'visibilitychange',
@@ -559,9 +552,9 @@ submitExam();
 });
 
 
-// =========================================
+// ====================================
 // DISABLE RIGHT CLICK
-// =========================================
+// ====================================
 
 document.addEventListener(
 'contextmenu',
@@ -569,9 +562,9 @@ event => event.preventDefault()
 );
 
 
-// =========================================
+// ====================================
 // DISABLE COPY / PASTE
-// =========================================
+// ====================================
 
 document.addEventListener(
 'copy',
@@ -589,9 +582,9 @@ event => event.preventDefault()
 );
 
 
-// =========================================
+// ====================================
 // DISABLE F12
-// =========================================
+// ====================================
 
 document.onkeydown = function(e) {
 
