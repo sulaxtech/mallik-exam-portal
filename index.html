@@ -137,8 +137,6 @@ video{
 
 <div class="container">
 
-<!-- LOGIN PAGE -->
-
 <div class="card" id="loginPage">
 
 <h2>Candidate Login</h2>
@@ -160,8 +158,6 @@ Start Exam
 </div>
 
 
-<!-- EXAM PAGE -->
-
 <div class="card hidden" id="examPage">
 
 <h2>Online Examination</h2>
@@ -176,8 +172,6 @@ Submit Exam
 
 </div>
 
-
-<!-- THANK YOU PAGE -->
 
 <div class="card hidden" id="thankPage">
 
@@ -200,34 +194,20 @@ Mallik Engineering Online Assessment Portal
 
 <script>
 
-// ====================================
-// APPS SCRIPT URL
-// ====================================
-
 const scriptURL =
 "https://script.google.com/macros/s/AKfycbyhY5V4Civ8o4YWNC87naanMNNUPfFbsi-n8SGrwDBULTryUvWj6h9sV3hh7KzmrahpVw/exec";
 
-
-// ====================================
-// VARIABLES
-// ====================================
-
 let questions = [];
-
 let examStarted = false;
-
 let submitted = false;
-
 let warningCount = 0;
-
 let timeLeft = 60 * 60;
-
 let timer;
 
 
-// ====================================
+// =====================================
 // START EXAM
-// ====================================
+// =====================================
 
 async function startExam(){
 
@@ -302,9 +282,9 @@ alert("Unable to load questions");
 }
 
 
-// ====================================
+// =====================================
 // LOAD QUESTIONS
-// ====================================
+// =====================================
 
 function loadQuestions(){
 
@@ -358,9 +338,9 @@ document.getElementById("questions")
 }
 
 
-// ====================================
+// =====================================
 // TIMER
-// ====================================
+// =====================================
 
 function startTimer(){
 
@@ -394,9 +374,9 @@ timeLeft--;
 }
 
 
-// ====================================
-// START WEBCAM
-// ====================================
+// =====================================
+// WEBCAM
+// =====================================
 
 function startWebcam(){
 
@@ -419,9 +399,9 @@ console.log(err);
 }
 
 
-// ====================================
+// =====================================
 // SUBMIT EXAM
-// ====================================
+// =====================================
 
 async function submitExam(){
 
@@ -494,6 +474,8 @@ await fetch(scriptURL,{
 
 method:"POST",
 
+mode:"no-cors",
+
 headers:{
 "Content-Type":"application/json"
 },
@@ -515,16 +497,23 @@ document.getElementById("thankPage")
 
 console.log(error);
 
-alert("Error saving result");
+document.getElementById("examPage")
+.classList.add("hidden");
+
+document.getElementById("timer")
+.classList.add("hidden");
+
+document.getElementById("thankPage")
+.classList.remove("hidden");
 
 }
 
 }
 
 
-// ====================================
+// =====================================
 // TAB SWITCH WARNING
-// ====================================
+// =====================================
 
 document.addEventListener(
 'visibilitychange',
@@ -552,9 +541,9 @@ submitExam();
 });
 
 
-// ====================================
+// =====================================
 // DISABLE RIGHT CLICK
-// ====================================
+// =====================================
 
 document.addEventListener(
 'contextmenu',
@@ -562,9 +551,9 @@ event => event.preventDefault()
 );
 
 
-// ====================================
+// =====================================
 // DISABLE COPY / PASTE
-// ====================================
+// =====================================
 
 document.addEventListener(
 'copy',
@@ -582,9 +571,9 @@ event => event.preventDefault()
 );
 
 
-// ====================================
+// =====================================
 // DISABLE F12
-// ====================================
+// =====================================
 
 document.onkeydown = function(e) {
 
