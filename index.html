@@ -132,14 +132,12 @@ margin-top:10px;
 
 <!-- TIMER -->
 <div class="timer hidden" id="timer">
-
 60:00
-
 </div>
 
 <div class="container">
 
-<!-- LOGIN -->
+<!-- LOGIN PAGE -->
 <div class="card" id="loginPage">
 
 <h2>Candidate Login</h2>
@@ -157,7 +155,7 @@ margin-top:10px;
 ✔ Webcam must remain ON<br>
 ✔ No tab switching allowed<br>
 ✔ Auto photo capture enabled<br>
-✔ Exam auto submits when time ends<br>
+✔ Exam auto submits when timer ends<br>
 
 </div>
 
@@ -169,7 +167,7 @@ I accept all exam rules
 
 </label>
 
-<button onclick="startExam()">
+<button id="startBtn">
 
 Start Exam
 
@@ -177,7 +175,7 @@ Start Exam
 
 </div>
 
-<!-- EXAM -->
+<!-- EXAM PAGE -->
 <div class="card hidden" id="examPage">
 
 <h2>Online Exam</h2>
@@ -186,7 +184,7 @@ Start Exam
 
 <div id="questions"></div>
 
-<button onclick="submitExam()">
+<button id="submitBtn">
 
 Submit Exam
 
@@ -233,11 +231,15 @@ video.srcObject = stream;
 
 await video.play();
 
+return true;
+
 }catch(err){
+
+console.log(err);
 
 alert("Please allow camera permission");
 
-console.log(err);
+return false;
 
 }
 
@@ -245,6 +247,8 @@ console.log(err);
 
 // ================= START EXAM =================
 async function startExam(){
+
+try{
 
 const nameInput =
 document.getElementById("name");
@@ -255,7 +259,7 @@ document.getElementById("mobile");
 const emailInput =
 document.getElementById("email");
 
-// NAME VALIDATION
+// NAME CHECK
 if(nameInput.value.trim() === ""){
 
 alert("Please enter name");
@@ -264,7 +268,7 @@ return;
 
 }
 
-// MOBILE VALIDATION
+// MOBILE CHECK
 if(mobileInput.value.trim().length < 10){
 
 alert("Enter valid mobile number");
@@ -273,7 +277,7 @@ return;
 
 }
 
-// EMAIL VALIDATION
+// EMAIL CHECK
 if(!emailInput.value.includes("@")){
 
 alert("Enter valid email");
@@ -282,7 +286,7 @@ return;
 
 }
 
-// RULES ACCEPT
+// RULES CHECK
 if(!document.getElementById("agree").checked){
 
 alert("Please accept exam rules");
@@ -291,45 +295,67 @@ return;
 
 }
 
+// CAMERA START
+const camStarted =
+await startCamera();
+
+if(!camStarted){
+
+return;
+
+}
+
 // HIDE LOGIN
-document.getElementById("loginPage")
+document
+.getElementById("loginPage")
 .classList.add("hidden");
 
 // SHOW EXAM
-document.getElementById("examPage")
+document
+.getElementById("examPage")
 .classList.remove("hidden");
 
 // SHOW TIMER
-document.getElementById("timer")
+document
+.getElementById("timer")
 .classList.remove("hidden");
 
-// START CAMERA
-await startCamera();
+// LOAD QUESTIONS
+const res =
+await fetch(scriptURL);
+
+questions =
+await res.json();
+
+if(!Array.isArray(questions)){
+
+alert("Questions not loaded");
+
+return;
+
+}
+
+// SHOW QUESTIONS
+loadQuestions();
+
+examStarted = true;
 
 // START TIMER
 startTimer();
 
-// LOAD QUESTIONS
-try{
-
-const res = await fetch(scriptURL);
-
-questions = await res.json();
-
-loadQuestions();
+// START AUTO PHOTO
+startMonitoring();
 
 }catch(err){
 
-alert("Question loading failed");
-
 console.log(err);
 
+alert(
+"Start Exam Error : " +
+err.message
+);
+
 }
-
-examStarted = true;
-
-// START MONITOR
-startMonitoring();
 
 }
 
@@ -375,7 +401,8 @@ html += `</div>`;
 
 });
 
-document.getElementById("questions")
+document
+.getElementById("questions")
 .innerHTML = html;
 
 }
@@ -391,7 +418,8 @@ Math.floor(timeLeft / 60);
 let s =
 timeLeft % 60;
 
-document.getElementById("timer")
+document
+.getElementById("timer")
 .innerText =
 
 `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
@@ -408,13 +436,19 @@ submitExam();
 
 }
 
-// ================= CAPTURE PHOTO =================
+// ================= PHOTO CAPTURE =================
 function capture(){
+
+try{
 
 const video =
 document.getElementById("webcam");
 
-if(!video.videoWidth) return;
+if(!video.videoWidth){
+
+return;
+
+}
 
 const canvas =
 document.createElement("canvas");
@@ -436,9 +470,15 @@ canvas.toDataURL(
 
 );
 
+}catch(err){
+
+console.log(err);
+
 }
 
-// ================= AUTO PHOTO CAPTURE =================
+}
+
+// ================= AUTO CAPTURE =================
 function startMonitoring(){
 
 setInterval(()=>{
@@ -453,7 +493,7 @@ capture();
 
 }
 
-// ================= TAB SWITCH DETECT =================
+// ================= TAB SWITCH =================
 document.addEventListener(
 "visibilitychange",
 ()=>{
@@ -469,17 +509,6 @@ capture();
 }
 );
 
-// ================= BLOCK REFRESH =================
-window.onbeforeunload = function(){
-
-if(examStarted){
-
-return "Exam is running";
-
-}
-
-};
-
 // ================= SUBMIT EXAM =================
 async function submitExam(){
 
@@ -492,7 +521,7 @@ capture();
 
 let score = 0;
 
-// SCORE CALCULATION
+// CALCULATE SCORE
 questions.forEach((q,i)=>{
 
 const selected =
@@ -528,7 +557,8 @@ score: score,
 
 correct: score,
 
-wrong: questions.length - score,
+wrong:
+questions.length - score,
 
 result:
 score >= (questions.length * 0.5)
@@ -581,11 +611,29 @@ result.message
 
 console.log(err);
 
-alert("Submit failed");
+alert(
+"Submit Error : " +
+err.message
+);
 
 }
 
 }
+
+// ================= BUTTON EVENTS =================
+document
+.getElementById("startBtn")
+.addEventListener(
+"click",
+startExam
+);
+
+document
+.getElementById("submitBtn")
+.addEventListener(
+"click",
+submitExam
+);
 
 </script>
 
