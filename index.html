@@ -198,7 +198,7 @@ Submit Exam
 
 // ================= APPS SCRIPT URL =================
 const scriptURL =
-"https://script.google.com/macros/s/AKfycbyhY5V4Civ8o4YWNC87naanMNNUPfFbsi-n8SGrwDBULTryUvWj6h9sV3hh7KzmrahpVw/exec";
+"https://script.google.com/macros/s/AKfycbzXfpo9LXdHtkHzkPSUq9-0tiSWN2qeSyKrqw-JVs-3enTVSJMhJccVRhk3IZ6UX-eLyQ/exec";
 
 // ================= VARIABLES =================
 let questions = [];
@@ -259,7 +259,7 @@ document.getElementById("mobile");
 const emailInput =
 document.getElementById("email");
 
-// NAME CHECK
+// NAME VALIDATION
 if(nameInput.value.trim() === ""){
 
 alert("Please enter name");
@@ -268,7 +268,7 @@ return;
 
 }
 
-// MOBILE CHECK
+// MOBILE VALIDATION
 if(mobileInput.value.trim().length < 10){
 
 alert("Enter valid mobile number");
@@ -277,7 +277,7 @@ return;
 
 }
 
-// EMAIL CHECK
+// EMAIL VALIDATION
 if(!emailInput.value.includes("@")){
 
 alert("Enter valid email");
@@ -286,7 +286,7 @@ return;
 
 }
 
-// RULES CHECK
+// RULES ACCEPT
 if(!document.getElementById("agree").checked){
 
 alert("Please accept exam rules");
@@ -335,7 +335,7 @@ return;
 
 }
 
-// SHOW QUESTIONS
+// DISPLAY QUESTIONS
 loadQuestions();
 
 examStarted = true;
@@ -436,7 +436,7 @@ submitExam();
 
 }
 
-// ================= PHOTO CAPTURE =================
+// ================= CAPTURE PHOTO =================
 function capture(){
 
 try{
@@ -521,7 +521,7 @@ capture();
 
 let score = 0;
 
-// CALCULATE SCORE
+// SCORE CALCULATION
 questions.forEach((q,i)=>{
 
 const selected =
@@ -572,7 +572,7 @@ photos: photos
 
 };
 
-// SEND DATA
+// SEND TO APPS SCRIPT
 const res = await fetch(scriptURL,{
 
 method:"POST",
