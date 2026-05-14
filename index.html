@@ -24,7 +24,10 @@ text-align:center;
 padding:20px;
 }
 
-.logo{width:130px;margin-bottom:10px}
+.logo{
+width:130px;
+margin-bottom:10px;
+}
 
 .container{
 max-width:900px;
@@ -78,7 +81,9 @@ font-weight:bold;
 z-index:999;
 }
 
-.hidden{display:none}
+.hidden{
+display:none;
+}
 
 video{
 width:240px;
@@ -98,6 +103,11 @@ margin-top:10px;
 line-height:1.5;
 }
 
+label{
+display:block;
+margin-top:10px;
+}
+
 </style>
 
 </head>
@@ -106,9 +116,13 @@ line-height:1.5;
 
 <!-- HEADER -->
 <div class="header">
+
 <img src="mallik-logo.jpg" class="logo">
+
 <h2>Mallik Engineering (India) Pvt Ltd</h2>
+
 <h4>Online Examination System</h4>
+
 </div>
 
 <div class="timer hidden" id="timer">60:00</div>
@@ -120,25 +134,38 @@ line-height:1.5;
 
 <h2>Candidate Login</h2>
 
-<input id="name" placeholder="Name">
-<input id="mobile" placeholder="Mobile">
-<input id="email" placeholder="Email">
+<input id="name" placeholder="Enter Name">
+
+<input id="mobile" placeholder="Enter Mobile">
+
+<input id="email" placeholder="Enter Email">
 
 <div class="rules">
-<b>Exam Rules:</b><br>
+
+<b>Exam Rules:</b><br><br>
+
+✔ Webcam must stay ON<br>
 ✔ No tab switching<br>
-✔ Webcam must be ON<br>
-✔ Multiple face detection warning<br>
-✔ Looking away detection active<br>
-✔ Auto submission on violations<br>
+✔ Multiple face detection enabled<br>
+✔ Looking away detection enabled<br>
+✔ Auto capture enabled<br>
+✔ Auto submit on time finish<br>
+
 </div>
 
 <label>
+
 <input type="checkbox" id="agree">
+
 I accept all exam rules
+
 </label>
 
-<button onclick="startExam()">Start Exam</button>
+<button onclick="startExam()">
+
+Start Exam
+
+</button>
 
 </div>
 
@@ -151,7 +178,11 @@ I accept all exam rules
 
 <div id="questions"></div>
 
-<button onclick="submitExam()">Submit Exam</button>
+<button onclick="submitExam()">
+
+Submit Exam
+
+</button>
 
 </div>
 
@@ -166,12 +197,21 @@ let questions = [];
 let photos = [];
 let timeLeft = 3600;
 let timer;
-let examStarted = false;
 
+let examStarted = false;
 let warning = 0;
 let paused = false;
 
-// ================= CAMERA FIXED =================
+// ================= LOAD FACE API =================
+async function loadFaceAPI(){
+
+await faceapi.nets.tinyFaceDetector.loadFromUri(
+"https://cdn.jsdelivr.net/npm/face-api.js/models"
+);
+
+}
+
+// ================= CAMERA =================
 async function startCamera(){
 
 try{
@@ -179,16 +219,20 @@ try{
 const video = document.getElementById("webcam");
 
 const stream = await navigator.mediaDevices.getUserMedia({
-video: true,
-audio: false
+video:true,
+audio:false
 });
 
 video.srcObject = stream;
+
 await video.play();
 
-}catch(e){
+}catch(err){
+
 alert("Camera permission required");
-console.log(e);
+
+console.log(err);
+
 }
 
 }
@@ -196,52 +240,97 @@ console.log(e);
 // ================= START EXAM =================
 async function startExam(){
 
-if(!document.getElementById("agree").checked){
-alert("Please accept rules");
+if(name.value.trim() === ""){
+alert("Enter name");
 return;
 }
 
-document.getElementById("loginPage").classList.add("hidden");
-document.getElementById("examPage").classList.remove("hidden");
-document.getElementById("timer").classList.remove("hidden");
+if(mobile.value.trim().length < 10){
+alert("Enter valid mobile number");
+return;
+}
 
-startCamera();
+if(!email.value.includes("@")){
+alert("Enter valid email");
+return;
+}
+
+if(!document.getElementById("agree").checked){
+alert("Please accept exam rules");
+return;
+}
+
+document.getElementById("loginPage")
+.classList.add("hidden");
+
+document.getElementById("examPage")
+.classList.remove("hidden");
+
+document.getElementById("timer")
+.classList.remove("hidden");
+
+await loadFaceAPI();
+
+await startCamera();
+
 startTimer();
 
 try{
+
 const res = await fetch(scriptURL);
+
 questions = await res.json();
+
 loadQuestions();
-}catch(e){
+
+}catch(err){
+
 alert("Question loading failed");
-console.log(e);
+
+console.log(err);
+
 }
 
 examStarted = true;
+
 startMonitoring();
+
 startAutoCapture();
 
 }
 
-// ================= QUESTIONS =================
+// ================= LOAD QUESTIONS =================
 function loadQuestions(){
 
-let html="";
+let html = "";
 
 questions.forEach((q,i)=>{
 
-html += `<div class="question">
-<h3>${i+1}. ${q.q}</h3>`;
+html += `
+<div class="question">
+
+<h3>${i+1}. ${q.q}</h3>
+`;
 
 q.options.forEach((o,j)=>{
-const l=["A","B","C","D"][j];
-html += `<label><input type="radio" name="q${i}" value="${l}"> ${l}) ${o}</label><br>`;
+
+const letter = ["A","B","C","D"][j];
+
+html += `
+<label>
+<input type="radio" name="q${i}" value="${letter}">
+${letter}) ${o}
+</label>
+`;
+
 });
 
 html += `</div>`;
+
 });
 
 document.getElementById("questions").innerHTML = html;
+
 }
 
 // ================= TIMER =================
@@ -251,90 +340,127 @@ timer = setInterval(()=>{
 
 if(paused) return;
 
-let m=Math.floor(timeLeft/60);
-let s=timeLeft%60;
+let m = Math.floor(timeLeft / 60);
+
+let s = timeLeft % 60;
 
 document.getElementById("timer").innerText =
-`${m}:${s}`;
+`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
 timeLeft--;
 
-if(timeLeft<=0) submitExam();
+if(timeLeft <= 0){
+
+submitExam();
+
+}
 
 },1000);
 
 }
 
-// ================= PHOTO =================
+// ================= CAPTURE PHOTO =================
 function capture(){
 
-const v=document.getElementById("webcam");
-const c=document.createElement("canvas");
-c.width=320;c.height=240;
+const v = document.getElementById("webcam");
+
+if(!v.videoWidth) return;
+
+const c = document.createElement("canvas");
+
+c.width = 320;
+c.height = 240;
+
 c.getContext("2d").drawImage(v,0,0);
-photos.push(c.toDataURL("image/png"));
 
-}
-
-// ================= AI MONITOR =================
-function startMonitoring(){
-
-setInterval(async()=>{
-
-if(!examStarted || paused) return;
-
-const v=document.getElementById("webcam");
-
-const d=await faceapi.detectAllFaces(
-v,
-new faceapi.TinyFaceDetectorOptions()
+photos.push(
+c.toDataURL("image/jpeg",0.5)
 );
 
-// NO FACE
-if(d.length===0){
-warn("No face detected");
-}
-
-// MULTIPLE FACE
-if(d.length>1){
-warn("Multiple faces detected");
-}
-
-// GAZE CHECK (basic)
-if(d.length===1 && d[0].box.width < 120){
-warn("Looking away detected");
-}
-
-},4000);
-
-}
-
-// ================= WARNING SYSTEM =================
-function warn(msg){
-
-warning++;
-capture();
-alert(msg);
-
-if(warning>=3){
-pauseExam("Too many violations");
-}
-
-}
-
-// ================= PAUSE =================
-function pauseExam(msg){
-paused=true;
-clearInterval(timer);
-alert(msg);
 }
 
 // ================= AUTO CAPTURE =================
 function startAutoCapture(){
 
 setInterval(()=>{
-if(!paused) capture();
-},30000);
+
+if(!paused){
+
+capture();
+
+}
+
+},60000);
+
+}
+
+// ================= FACE MONITOR =================
+function startMonitoring(){
+
+setInterval(async()=>{
+
+if(!examStarted || paused) return;
+
+const v = document.getElementById("webcam");
+
+const detections = await faceapi.detectAllFaces(
+v,
+new faceapi.TinyFaceDetectorOptions()
+);
+
+// NO FACE
+if(detections.length === 0){
+
+warn("No face detected");
+
+}
+
+// MULTIPLE FACE
+if(detections.length > 1){
+
+warn("Multiple faces detected");
+
+}
+
+// LOOKING AWAY
+if(
+detections.length === 1 &&
+detections[0].box.width < 80
+){
+
+warn("Looking away detected");
+
+}
+
+},5000);
+
+}
+
+// ================= WARNING =================
+function warn(msg){
+
+warning++;
+
+capture();
+
+alert(msg);
+
+if(warning >= 3){
+
+pauseExam("Exam paused due to violations");
+
+}
+
+}
+
+// ================= PAUSE =================
+function pauseExam(msg){
+
+paused = true;
+
+clearInterval(timer);
+
+alert(msg);
 
 }
 
@@ -342,52 +468,105 @@ if(!paused) capture();
 document.addEventListener("visibilitychange",()=>{
 
 if(document.hidden && examStarted){
-warn("Tab switch detected");
+
+warn("Tab switching detected");
+
 }
 
 });
 
-// ================= SUBMIT FIXED =================
+// ================= REFRESH BLOCK =================
+window.onbeforeunload = function(){
+
+if(examStarted){
+
+return "Exam is running";
+
+}
+
+};
+
+// ================= SUBMIT EXAM =================
 async function submitExam(){
 
 try{
 
 clearInterval(timer);
+
 capture();
 
-let score=0;
+let score = 0;
 
 questions.forEach((q,i)=>{
-let s=document.querySelector(`input[name="q${i}"]:checked`);
-if(s && s.value===q.answer) score++;
+
+let selected = document.querySelector(
+`input[name="q${i}"]:checked`
+);
+
+if(selected && selected.value === q.answer){
+
+score++;
+
+}
+
 });
 
-let payload={
-name:name.value,
-mobile:mobile.value,
-email:email.value,
-score,
-correct:score,
-wrong:questions.length-score,
-result:score>=50?"PASS":"FAIL",
-timeTaken:3600-timeLeft,
-photos
+const payload = {
+
+name: name.value,
+mobile: mobile.value,
+email: email.value,
+
+score: score,
+
+correct: score,
+
+wrong: questions.length - score,
+
+result:
+score >= (questions.length * 0.5)
+? "PASS"
+: "FAIL",
+
+timeTaken: 3600 - timeLeft,
+
+photos: photos
+
 };
 
-const res=await fetch(scriptURL,{
+const res = await fetch(scriptURL,{
+
 method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(payload)
+
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
+
+body: JSON.stringify(payload)
+
 });
 
-await res.text();
+const result = await res.json();
+
+console.log(result);
+
+if(result.status === "success"){
 
 alert("Exam Submitted Successfully");
 
-}catch(e){
+location.reload();
+
+}else{
+
+alert("Submission Failed : " + result.message);
+
+}
+
+}catch(err){
+
+console.log(err);
 
 alert("Submit failed");
-console.log(e);
 
 }
 
