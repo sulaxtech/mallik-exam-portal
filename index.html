@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
@@ -13,7 +13,7 @@
 
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial,sans-serif;
 background:#0b0f1a;
 color:white;
 }
@@ -25,7 +25,7 @@ padding:20px;
 }
 
 .logo{
-width:130px;
+width:120px;
 margin-bottom:10px;
 }
 
@@ -46,9 +46,10 @@ input{
 width:100%;
 padding:12px;
 margin-top:10px;
-border-radius:8px;
 border:none;
+border-radius:8px;
 box-sizing:border-box;
+font-size:15px;
 }
 
 button{
@@ -59,16 +60,19 @@ background:#2563eb;
 color:white;
 border:none;
 border-radius:8px;
-cursor:pointer;
 font-size:16px;
 cursor:pointer;
+}
+
+button:hover{
+opacity:0.9;
 }
 
 .question{
 background:#1f2937;
 padding:15px;
-margin-top:10px;
 border-radius:10px;
+margin-top:15px;
 }
 
 .timer{
@@ -101,7 +105,7 @@ padding:12px;
 border-radius:10px;
 font-size:14px;
 margin-top:10px;
-line-height:1.5;
+line-height:1.7;
 }
 
 label{
@@ -128,12 +132,14 @@ margin-top:10px;
 
 <!-- TIMER -->
 <div class="timer hidden" id="timer">
+
 60:00
+
 </div>
 
 <div class="container">
 
-<!-- LOGIN PAGE -->
+<!-- LOGIN -->
 <div class="card" id="loginPage">
 
 <h2>Candidate Login</h2>
@@ -142,16 +148,16 @@ margin-top:10px;
 
 <input type="text" id="mobile" placeholder="Enter Mobile Number">
 
-<input type="email" id="email" placeholder="Enter Email">
+<input type="email" id="email" placeholder="Enter Email Address">
 
 <div class="rules">
 
 <b>Exam Rules:</b><br><br>
 
-✔ Webcam must stay ON<br>
-✔ No tab switching<br>
+✔ Webcam must remain ON<br>
+✔ No tab switching allowed<br>
 ✔ Auto photo capture enabled<br>
-✔ Exam auto submits when timer ends<br>
+✔ Exam auto submits when time ends<br>
 
 </div>
 
@@ -171,7 +177,7 @@ Start Exam
 
 </div>
 
-<!-- EXAM PAGE -->
+<!-- EXAM -->
 <div class="card hidden" id="examPage">
 
 <h2>Online Exam</h2>
@@ -229,7 +235,7 @@ await video.play();
 
 }catch(err){
 
-alert("Camera permission required");
+alert("Please allow camera permission");
 
 console.log(err);
 
@@ -240,8 +246,17 @@ console.log(err);
 // ================= START EXAM =================
 async function startExam(){
 
-// NAME CHECK
-if(name.value.trim() === ""){
+const nameInput =
+document.getElementById("name");
+
+const mobileInput =
+document.getElementById("mobile");
+
+const emailInput =
+document.getElementById("email");
+
+// NAME VALIDATION
+if(nameInput.value.trim() === ""){
 
 alert("Please enter name");
 
@@ -249,8 +264,8 @@ return;
 
 }
 
-// MOBILE CHECK
-if(mobile.value.trim().length < 10){
+// MOBILE VALIDATION
+if(mobileInput.value.trim().length < 10){
 
 alert("Enter valid mobile number");
 
@@ -258,8 +273,8 @@ return;
 
 }
 
-// EMAIL CHECK
-if(!email.value.includes("@")){
+// EMAIL VALIDATION
+if(!emailInput.value.includes("@")){
 
 alert("Enter valid email");
 
@@ -267,7 +282,7 @@ return;
 
 }
 
-// RULES CHECK
+// RULES ACCEPT
 if(!document.getElementById("agree").checked){
 
 alert("Please accept exam rules");
@@ -311,10 +326,9 @@ console.log(err);
 
 }
 
-// START EXAM
 examStarted = true;
 
-// START PHOTO CAPTURE
+// START MONITOR
 startMonitoring();
 
 }
@@ -336,7 +350,7 @@ html += `
 
 q.options.forEach((o,j)=>{
 
-const letter =
+const option =
 ["A","B","C","D"][j];
 
 html += `
@@ -346,10 +360,10 @@ html += `
 <input
 type="radio"
 name="q${i}"
-value="${letter}"
+value="${option}"
 >
 
-${letter}) ${o}
+${option}) ${o}
 
 </label>
 
@@ -397,30 +411,34 @@ submitExam();
 // ================= CAPTURE PHOTO =================
 function capture(){
 
-const v =
+const video =
 document.getElementById("webcam");
 
-if(!v.videoWidth) return;
+if(!video.videoWidth) return;
 
-const c =
+const canvas =
 document.createElement("canvas");
 
-c.width = 320;
+canvas.width = 320;
 
-c.height = 240;
+canvas.height = 240;
 
-c.getContext("2d")
-.drawImage(v,0,0);
+canvas
+.getContext("2d")
+.drawImage(video,0,0);
 
 photos.push(
 
-c.toDataURL("image/jpeg",0.5)
+canvas.toDataURL(
+"image/jpeg",
+0.5
+)
 
 );
 
 }
 
-// ================= AUTO PHOTO =================
+// ================= AUTO PHOTO CAPTURE =================
 function startMonitoring(){
 
 setInterval(()=>{
@@ -435,8 +453,10 @@ capture();
 
 }
 
-// ================= TAB SWITCH DETECTION =================
-document.addEventListener("visibilitychange",()=>{
+// ================= TAB SWITCH DETECT =================
+document.addEventListener(
+"visibilitychange",
+()=>{
 
 if(document.hidden && examStarted){
 
@@ -446,9 +466,10 @@ capture();
 
 }
 
-});
+}
+);
 
-// ================= REFRESH BLOCK =================
+// ================= BLOCK REFRESH =================
 window.onbeforeunload = function(){
 
 if(examStarted){
@@ -471,17 +492,19 @@ capture();
 
 let score = 0;
 
-// CALCULATE SCORE
+// SCORE CALCULATION
 questions.forEach((q,i)=>{
 
-let selected =
+const selected =
 
 document.querySelector(
 `input[name="q${i}"]:checked`
 );
 
-if(selected &&
-selected.value === q.answer){
+if(
+selected &&
+selected.value === q.answer
+){
 
 score++;
 
@@ -489,14 +512,17 @@ score++;
 
 });
 
-// CREATE PAYLOAD
+// PAYLOAD
 const payload = {
 
-name: name.value,
+name:
+document.getElementById("name").value,
 
-mobile: mobile.value,
+mobile:
+document.getElementById("mobile").value,
 
-email: email.value,
+email:
+document.getElementById("email").value,
 
 score: score,
 
@@ -509,19 +535,21 @@ score >= (questions.length * 0.5)
 ? "PASS"
 : "FAIL",
 
-timeTaken: 3600 - timeLeft,
+timeTaken:
+3600 - timeLeft,
 
 photos: photos
 
 };
 
-// SEND TO APPS SCRIPT
+// SEND DATA
 const res = await fetch(scriptURL,{
 
 method:"POST",
 
 headers:{
-"Content-Type":"text/plain;charset=utf-8"
+"Content-Type":
+"text/plain;charset=utf-8"
 },
 
 body: JSON.stringify(payload)
