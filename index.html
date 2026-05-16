@@ -16,6 +16,9 @@ margin:0;
 font-family:Arial,sans-serif;
 background:#0b0f1a;
 color:white;
+user-select:none;
+-webkit-user-select:none;
+-ms-user-select:none;
 }
 
 .header{
@@ -90,13 +93,19 @@ z-index:999;
 display:none;
 }
 
-video{
+/* FIXED WEBCAM */
+#webcam{
+position:fixed;
+top:70px;
+right:15px;
 width:240px;
 height:180px;
 border-radius:10px;
-margin-top:10px;
 background:black;
 object-fit:cover;
+z-index:9999;
+border:3px solid #2563eb;
+box-shadow:0 0 10px rgba(0,0,0,0.5);
 }
 
 .rules{
@@ -117,7 +126,12 @@ margin-top:10px;
 
 </head>
 
-<body>
+<body
+oncopy="return false"
+oncut="return false"
+onpaste="return false"
+ondragstart="return false"
+>
 
 <!-- HEADER -->
 <div class="header">
@@ -195,6 +209,40 @@ Submit Exam
 </div>
 
 <script>
+
+// ================= DISABLE RIGHT CLICK =================
+document.addEventListener(
+"contextmenu",
+e => e.preventDefault()
+);
+
+// ================= DISABLE SHORTCUT KEYS =================
+document.addEventListener(
+"keydown",
+function(e){
+
+// F12
+if(e.key === "F12"){
+e.preventDefault();
+}
+
+// CTRL + SHIFT + I
+if(e.ctrlKey && e.shiftKey && e.key === "I"){
+e.preventDefault();
+}
+
+// CTRL + SHIFT + J
+if(e.ctrlKey && e.shiftKey && e.key === "J"){
+e.preventDefault();
+}
+
+// CTRL + U
+if(e.ctrlKey && e.key === "u"){
+e.preventDefault();
+}
+
+}
+);
 
 // ================= APPS SCRIPT URL =================
 const scriptURL =
