@@ -19,6 +19,7 @@ color:white;
 user-select:none;
 -webkit-user-select:none;
 -ms-user-select:none;
+overflow-x:hidden;
 }
 
 .header{
@@ -102,7 +103,7 @@ width:240px;
 height:180px;
 border-radius:10px;
 background:black;
-object-fit:cover;
+object-fit:contain;
 z-index:9999;
 border:3px solid #2563eb;
 box-shadow:0 0 10px rgba(0,0,0,0.5);
@@ -501,19 +502,25 @@ return;
 const canvas =
 document.createElement("canvas");
 
-canvas.width = 320;
+canvas.width = video.videoWidth;
 
-canvas.height = 240;
+canvas.height = video.videoHeight;
 
 canvas
 .getContext("2d")
-.drawImage(video,0,0);
+.drawImage(
+video,
+0,
+0,
+canvas.width,
+canvas.height
+);
 
 photos.push(
 
 canvas.toDataURL(
 "image/jpeg",
-0.5
+0.7
 )
 
 );
