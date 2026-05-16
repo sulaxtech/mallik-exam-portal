@@ -170,6 +170,7 @@ ondragstart="return false"
 ✔ Webcam must remain ON<br>
 ✔ No tab switching allowed<br>
 ✔ Auto photo capture enabled<br>
+✔ Fullscreen mode enabled<br>
 ✔ Exam auto submits when timer ends<br>
 
 </div>
@@ -260,6 +261,27 @@ let timer;
 
 let examStarted = false;
 
+// ================= FULL SCREEN =================
+async function enterFullScreen(){
+
+const elem = document.documentElement;
+
+if(elem.requestFullscreen){
+
+await elem.requestFullscreen();
+
+}else if(elem.webkitRequestFullscreen){
+
+await elem.webkitRequestFullscreen();
+
+}else if(elem.msRequestFullscreen){
+
+await elem.msRequestFullscreen();
+
+}
+
+}
+
 // ================= START CAMERA =================
 async function startCamera(){
 
@@ -343,6 +365,9 @@ alert("Please accept exam rules");
 return;
 
 }
+
+// ENTER FULL SCREEN
+await enterFullScreen();
 
 // CAMERA START
 const camStarted =
@@ -556,6 +581,27 @@ document.addEventListener(
 if(document.hidden && examStarted){
 
 alert("Tab switching detected");
+
+capture();
+
+}
+
+}
+);
+
+// ================= FULLSCREEN EXIT =================
+document.addEventListener(
+"fullscreenchange",
+()=>{
+
+if(
+!document.fullscreenElement &&
+examStarted
+){
+
+alert(
+"Fullscreen exited! Please return to exam."
+);
 
 capture();
 
